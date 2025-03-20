@@ -22,7 +22,7 @@
     <Company>Mark Castle</Company>
     <Authors>Mark Castle</Authors>
     <Description>Command line tool for analyzing HLS playlists</Description>
-    <Copyright>Copyright © Mark Castle 2023</Copyright>
+    <Copyright>Copyright © Mark Castle 2025</Copyright>
     <AssemblyTitle>HLS Parser Command Line Tool</AssemblyTitle>
     <AssemblyName>HlsParser.CommandLine</AssemblyName>
     <PackageId>HlsParser.CommandLine</PackageId>
