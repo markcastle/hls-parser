@@ -16,6 +16,9 @@ A robust HTTP Live Streaming (HLS) parser library for .NET applications. This li
 
 ### 📦 Installation
 
+> **Note:** This package is not yet published to NuGet. We plan to publish it soon. In the meantime, you can build and reference the library directly from the source code.
+
+Once published, you'll be able to install it using:
 ```
 dotnet add package HlsParser
 ```
