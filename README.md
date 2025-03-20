@@ -10,6 +10,7 @@ A robust HTTP Live Streaming (HLS) parser library for .NET applications. This li
 - 🔒 Encryption support (AES-128, SAMPLE-AES)
 - 📥 Segment download
 - 🧩 Clean API for client applications
+- 🖥️ Command line tool for analyzing playlists
 
 ## 🚀 Getting Started
 
@@ -52,6 +53,89 @@ if (masterPlaylist.Streams.Count > 0)
         Console.WriteLine($"Downloaded segment: {segmentData.Length} bytes");
     }
 }
+```
+
+## 🖥️ Command Line Tool
+
+The HLS Parser comes with a command line tool that allows you to analyze HLS playlists directly from the terminal.
+
+### Features
+
+- Analyze both master and media playlists
+- Display detailed information about stream variants, renditions, and segments
+- Automatically detect playlist type
+- Show all playlist tags
+
+### Usage
+
+```
+HlsParser <playlist_url>
+```
+
+### Examples
+
+**Analyzing a master playlist:**
+
+```
+HlsParser https://bitdash-a.akamaihd.net/content/sintel/hls/playlist.m3u8
+```
+
+This will display:
+- Playlist version and URI
+- List of stream variants with resolution, bandwidth, and codec information
+- Audio and subtitle rendition groups
+- All tags from the playlist
+
+**Analyzing a media playlist:**
+
+```
+HlsParser https://bitdash-a.akamaihd.net/content/sintel/hls/video/1500kbit.m3u8
+```
+
+This will display:
+- Playlist version and URI
+- Target duration and media sequence number
+- Endless status and discontinuity information
+- Detailed information about the first 10 segments
+- All tags from the playlist
+
+### Building a Single Executable
+
+To build the command line tool as a single executable with all dependencies embedded:
+
+```
+# For Windows
+dotnet publish src/HlsParser.CommandLine/HlsParser.CommandLine.csproj -c Release -r win-x64 --self-contained true
+
+# For macOS
+dotnet publish src/HlsParser.CommandLine/HlsParser.CommandLine.csproj -c Release -r osx-x64 --self-contained true
+
+# For Linux
+dotnet publish src/HlsParser.CommandLine/HlsParser.CommandLine.csproj -c Release -r linux-x64 --self-contained true
+```
+
+Note: You may need to edit the `HlsParser.CommandLine.csproj` file to set the correct `RuntimeIdentifier` for your target platform:
+
+```xml
+<RuntimeIdentifier>win-x64</RuntimeIdentifier>  <!-- Change to osx-x64 or linux-x64 as needed -->
+```
+
+The executable will be created in the `src/HlsParser.CommandLine/bin/Release/net8.0/[platform]/publish/` directory. You will find:
+
+1. `HlsParser.CommandLine.exe` - The main executable
+2. `HlsParser.bat` - A Windows batch file wrapper that lets you use the shorter `HlsParser` command
+3. `HlsParser` - A shell script for Linux/macOS users that lets you use the shorter command (make it executable with `chmod +x HlsParser`)
+
+**Using the shorter command:**
+
+On Windows:
+```
+HlsParser https://example.com/master.m3u8
+```
+
+On Linux/macOS:
+```
+./HlsParser https://example.com/master.m3u8
 ```
 
 ## 📚 API Reference

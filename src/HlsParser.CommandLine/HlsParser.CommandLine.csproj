@@ -1,0 +1,31 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="..\HlsParser\HlsParser.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="HlsParser.bat" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="HlsParser" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <PublishSingleFile Condition="'$(Configuration)' == 'Release'">true</PublishSingleFile>
+    <SelfContained>true</SelfContained>
+    <PublishReadyToRun>false</PublishReadyToRun>
+    <PublishTrimmed>true</PublishTrimmed>
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <Company>Mark Castle</Company>
+    <Authors>Mark Castle</Authors>
+    <Description>Command line tool for analyzing HLS playlists</Description>
+    <Copyright>Copyright © Mark Castle 2023</Copyright>
+    <AssemblyTitle>HLS Parser Command Line Tool</AssemblyTitle>
+    <AssemblyName>HlsParser.CommandLine</AssemblyName>
+    <PackageId>HlsParser.CommandLine</PackageId>
+  </PropertyGroup>
+
+</Project>
