@@ -5,8 +5,8 @@
     <Nullable>enable</Nullable>
     <PackageId>HlsParser.Abstractions</PackageId>
     <Version>1.0.0</Version>
-    <Authors>CaptiveReality</Authors>
-    <Company>CaptiveReality</Company>
+    <Authors>Mark Castle</Authors>
+    <Company>Mark Castle</Company>
     <Description>Abstractions for the HlsParser library to support dependency injection</Description>
     <PackageTags>hls;m3u8;streaming;video;parser;abstractions;di</PackageTags>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
