@@ -7,7 +7,7 @@ A robust HTTP Live Streaming (HLS) parser library for .NET applications. This li
 - 🎬 Parse master and media playlists
 - 🏷️ Support for EXT-X tags specified in the HLS specification
 - 🔄 Stream variant handling
-- 🔒 Encryption support (AES-128, SAMPLE-AES)
+- 🔒 Encryption metadata parsing (AES-128, SAMPLE-AES) - *Note: Provides encryption information but does not implement decryption*
 - 📥 Segment download
 - 🧩 Clean API for client applications
 - 🖥️ Command line tool for analyzing playlists
@@ -51,6 +51,14 @@ if (masterPlaylist.Streams.Count > 0)
         var segment = mediaPlaylist.Segments[0];
         var segmentData = await client.GetSegmentAsync(segment);
         Console.WriteLine($"Downloaded segment: {segmentData.Length} bytes");
+        
+        // If the segment is encrypted, you'll need to implement your own decryption
+        if (segment.Encryption != null)
+        {
+            Console.WriteLine($"Segment is encrypted with method: {segment.Encryption.Method}");
+            Console.WriteLine($"Key URI: {segment.Encryption.KeyUri}");
+            // Decryption must be implemented by the consumer of this library
+        }
     }
 }
 ```
@@ -156,6 +164,7 @@ var mediaPlaylist = await client.GetMediaPlaylistAsync(uri);
 
 // Get a media segment
 var segmentData = await client.GetSegmentAsync(segment);
+// Note: If segment is encrypted, decryption must be handled by you
 ```
 
 ### 📋 Models
@@ -215,11 +224,35 @@ public class MediaSegment
     public int SequenceNumber { get; set; }
     public bool HasDiscontinuity { get; set; }
     public string ByteRange { get; set; }
-    public EncryptionInfo Encryption { get; set; }
+    public EncryptionInfo Encryption { get; set; }  // Metadata only, decryption not implemented
     public DateTimeOffset? ProgramDateTime { get; set; }
     public IList<Tag> Tags { get; set; }
 }
 ```
+
+#### 🔐 EncryptionInfo
+
+Contains metadata about segment encryption.
+
+```csharp
+public class EncryptionInfo
+{
+    public string Method { get; set; }      // E.g., "AES-128", "SAMPLE-AES"
+    public Uri KeyUri { get; set; }         // URI to fetch the decryption key
+    public string Iv { get; set; }          // Initialization vector
+    public string KeyFormat { get; set; }   // Format of the key
+    public string KeyFormatVersions { get; set; }
+}
+```
+
+## 🔄 Handling Encrypted Segments
+
+This library parses encryption metadata but does not implement decryption. For encrypted segments, you'll need to:
+
+1. Check if `segment.Encryption != null`
+2. Download the key from `segment.Encryption.KeyUri`
+3. Use the encryption method, key, and IV to decrypt the segment data
+4. Implement decryption according to the HLS specification for the specific method (AES-128, SAMPLE-AES, etc.)
 
 ## 📜 License
 
