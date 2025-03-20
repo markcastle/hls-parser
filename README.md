@@ -11,6 +11,7 @@ A robust HTTP Live Streaming (HLS) parser library for .NET applications. This li
 - 📥 Segment download
 - 🧩 Clean API for client applications
 - 🖥️ Command line tool for analyzing playlists
+- 🔌 Dependency Injection support through abstractions
 
 ## 🚀 Getting Started
 
@@ -21,6 +22,11 @@ A robust HTTP Live Streaming (HLS) parser library for .NET applications. This li
 Once published, you'll be able to install it using:
 ```
 dotnet add package HlsParser
+```
+
+For Dependency Injection support:
+```
+dotnet add package HlsParser.Abstractions
 ```
 
 ### 💻 Basic Usage
@@ -65,6 +71,63 @@ if (masterPlaylist.Streams.Count > 0)
     }
 }
 ```
+
+### 🔌 Using Dependency Injection
+
+```csharp
+using Microsoft.Extensions.DependencyInjection;
+using HlsParser.Abstractions;
+
+// In your startup code
+services.AddHlsParser();
+
+// Or with a custom HttpClient configuration
+services.AddHlsParser(client => 
+{
+    client.Timeout = TimeSpan.FromSeconds(30);
+    client.DefaultRequestHeaders.Add("User-Agent", "Your User Agent");
+});
+
+// In your application code
+public class MyService
+{
+    private readonly IHlsClient _hlsClient;
+
+    public MyService(IHlsClient hlsClient)
+    {
+        _hlsClient = hlsClient;
+    }
+
+    public async Task ProcessPlaylistAsync(string url)
+    {
+        var playlist = await _hlsClient.GetPlaylistAsync(new Uri(url));
+        
+        if (playlist is IMasterPlaylist masterPlaylist)
+        {
+            // Process master playlist
+            Console.WriteLine($"Found {masterPlaylist.Streams.Count} stream variants");
+        }
+        else if (playlist is IMediaPlaylist mediaPlaylist)
+        {
+            // Process media playlist
+            Console.WriteLine($"Found {mediaPlaylist.Segments.Count} segments");
+        }
+    }
+}
+```
+
+## 🛠️ Recent Updates
+
+### Nullable Reference Type Support
+
+- The library now properly supports nullable reference types in C# 8+
+- The `IRendition.Uri` property has been updated to handle null values correctly when a rendition doesn't have a URI
+- URI handling has been improved to gracefully handle invalid URI strings
+
+### Bug Fixes
+
+- Fixed an issue with URI parsing in `RenditionAdapter` that would throw exceptions when encountering invalid URI formats
+- Improved error handling throughout the codebase to provide more graceful degradation
 
 ## 🖥️ Command Line Tool
 
@@ -168,6 +231,66 @@ var mediaPlaylist = await client.GetMediaPlaylistAsync(uri);
 // Get a media segment
 var segmentData = await client.GetSegmentAsync(segment);
 // Note: If segment is encrypted, decryption must be handled by you
+```
+
+### 🧩 Abstractions
+
+For dependency injection scenarios, use the interfaces in the `HlsParser.Abstractions` namespace:
+
+```csharp
+// Main interfaces
+IHlsClient                // Client for downloading and parsing playlists
+IHlsParser               // Parser for HLS playlists
+
+// Model interfaces
+IPlaylist                // Base interface for all playlists
+IMasterPlaylist          // Interface for master playlists
+IMediaPlaylist           // Interface for media playlists
+IMediaSegment            // Interface for media segments
+IStreamInfo              // Interface for stream variants
+IRenditionGroup          // Interface for rendition groups
+IRendition               // Interface for renditions
+ITag                     // Interface for HLS tags
+IEncryptionInfo          // Interface for encryption metadata
+```
+
+#### Adapter Pattern Implementation
+
+The `HlsParser.Abstractions` library uses the adapter pattern to provide a clean interface layer between the core library models and client code. Key adapter implementations include:
+
+- `PlaylistAdapter` - Base adapter for all playlist types
+- `MasterPlaylistAdapter` - Adapts the core `MasterPlaylist` model to the `IMasterPlaylist` interface
+- `MediaPlaylistAdapter` - Adapts the core `MediaPlaylist` model to the `IMediaPlaylist` interface
+- `RenditionGroupAdapter` - Adapts the core `RenditionGroup` model to the `IRenditionGroup` interface
+- `RenditionAdapter` - Adapts the core `Rendition` model to the `IRendition` interface
+
+These adapters provide proper nullability handling and ensure that the library operates correctly in various edge cases, such as when dealing with missing or invalid URIs in renditions.
+
+#### Nullability and Error Handling
+
+The abstractions layer has been designed with nullable reference types in mind:
+
+- Properties like `IRendition.Uri` are properly defined with correct nullability annotations
+- Adapters implement graceful error handling to prevent exceptions when encountering invalid data
+- The design allows for defensive programming practices when working with potentially missing data
+
+Example of proper nullability handling in client code:
+
+```csharp
+foreach (var rendition in renditionGroup.Renditions)
+{
+    Console.WriteLine($"Rendition: {rendition.Name}");
+    
+    // Safe access to nullable URI
+    if (rendition.Uri != null)
+    {
+        Console.WriteLine($"URI: {rendition.Uri}");
+    }
+    else
+    {
+        Console.WriteLine("No URI available");
+    }
+}
 ```
 
 ### 📋 Models
